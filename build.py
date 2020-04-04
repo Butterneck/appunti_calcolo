@@ -6,7 +6,7 @@ import subprocess
 from subprocess import check_output
 
 
-def buildDirs(dirs):
+def build():
     dirs = getDirs()
 
     mkdir('output')
@@ -36,7 +36,7 @@ def clearOutputDir(path = './output'):
 
 
 def main():
-    buildDirs(dirs)
+    build()
 
 
 if __name__ == '__main__':
