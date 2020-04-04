@@ -21,7 +21,7 @@ def buildDir(dir):
     jobname = "-jobname=" + basename
     lezione = ".".join([basename, "tex"])
 
-    buildCmd = ["docker", "run", "-i", "-v", "/".join([getcwd(), dir]) + ":/data", "blang/latex", "latexmk", "-interaction=nonstopmode", "-pdf", jobname, lezione]
+    buildCmd = ["docker", "run", "-i", "-v", "/".join([getcwd(), dir]) + ":/data", "blang/latex", "latexmk", "-pdf", jobname, lezione]
     subprocess.run(buildCmd)
 
 
