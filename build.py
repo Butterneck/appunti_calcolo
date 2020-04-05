@@ -20,7 +20,6 @@ def getDirs(path='.'):
     return dirs
 
 
-
 def buildDirs(dirs):
     for dir in dirs:
         buildDir(dir)
@@ -31,7 +30,7 @@ def buildDir(dir):
     jobname = "-jobname=" + basename
     lezione = ".".join([basename, "tex"])
 
-    buildCmd = ["docker", "run", "-i", "-v", "/".join([getcwd(), dir]) + ":/data", "blang/latex", "latexmk", "-pdf", jobname, lezione]
+    buildCmd = ["docker", "run", "-i", "-v", join(getcwd(), dir) + ":/data", "blang/latex", "latexmk", "-pdf", jobname, lezione]
     subprocess.run(buildCmd)
 
 
@@ -39,12 +38,12 @@ def groupPdfs(dirs, outputDir='./output'):
     mkdir(outputDir)
 
     for dir in dirs:
-        path = "/".join([getcwd(), dir])
+        path = join(getcwd(), dir)
         files = [f for f in listdir(path) if isfile(join(path, f))]
         for file in files:
             filename, file_extension = splitext(file)
             if file_extension == '.pdf':
-                move("/".join([path, filename + file_extension]), "/".join([outputDir, filename + file_extension]))
+                move(join(path, filename + file_extension), join(outputDir, filename + file_extension))
 
 
 def generateCompletePdf(outputDir='./output'):
@@ -55,9 +54,9 @@ def generateCompletePdf(outputDir='./output'):
     files = orderFiles(files)
 
     for pdf in files:
-        merger.append("/".join([path, pdf]))
+        merger.append(join(path, pdf))
 
-    merger.write("/".join([path, "lezioni.pdf"]))
+    merger.write(join(path, "lezioni.pdf"))
     merger.close()
 
 
@@ -67,12 +66,12 @@ def orderFiles(files):
     return [''.join(["lezione", index, ".pdf"]) for index in indexes]
 
 
-
 def main():
     dirs = getDirs()
     buildDirs(dirs)
     groupPdfs(dirs)
     generateCompletePdf()    
+
 
 if __name__ == '__main__':
     main()
