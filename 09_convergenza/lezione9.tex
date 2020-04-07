@@ -26,38 +26,38 @@ In queste lezioni introdurremo un metodo molto più efficiente per il calcolo di
 \end{center}
 Per trovare l'espressione analitica delle iterazioni, calcoliamo lo zero della retta tangente nel punto($x_0,f(x_0)$):
 \begin{center}
-    \begin{cases}
+    $\begin{cases}
         y = 0 &\mbox{asse } x\\
-        y = f(x_0) + \sideset{}{'}f(x_0)(x-x_0) &\mbox{retta tangente}
-    \end{cases}
+        y = f(x_0) + f'(x_0)(x-x_0) &\mbox{retta tangente}
+    \end{cases}$
 \end{center}
 dove stiamo usando l'interpretazione geometrica della derivata nel punto $x_0$ come coefficiente angolare della retta tangente nel corrispondente punto del grafico di $f$. Otteniamo l'equazione 
 \begin{equation*}
-    o=f(x_0)+ \sideset{}{'}f(x_0)(x-x_0)
+    o=f(x_0)+ f'(x_0)(x-x_0)
 \end{equation*}
 la cui soluzione è
 \begin{equation*}
-    x_1=x_0-\frac{f(x_0)}{\sideset{}{'}f(x_0)},\sideset{}{'}f(x_0)\neq 0
+    x_1=x_0-\frac{f(x_0)}{f'(x_0)},f'(x_0)\neq 0
 \end{equation*}
-Osserviamo subito che se $\sideset{}{'}f(x_0)=0$ la retta tangente sarebbe parallela all'asse $x$ e non avrebbe un punto di intersezione con esso; ma è essenziale anche la posizione del valore iniziale $x_0$, se scelto "male" già la prima iterazione potrebbe far uscire dall'intervallo di definizione:\\
+Osserviamo subito che se $f'(x_0)=0$ la retta tangente sarebbe parallela all'asse $x$ e non avrebbe un punto di intersezione con esso; ma è essenziale anche la posizione del valore iniziale $x_0$, se scelto "male" già la prima iterazione potrebbe far uscire dall'intervallo di definizione:\\
 \begin{center}
     \includegraphics[scale=0.5]{pagina7.PNG}
 \end{center}
 In generale, per ottenere $x_{n+1}$ a partire da $x_n$ (se $f'(x_n)\neq 0$) si cerca l'intersezione della tangente in ($x_n,f(x_n)$ con l'asse $x$ ($y=0$)\\
 \begin{center}
-    \begin{cases}
+    $\begin{cases}
         y=0\\
         y=f(x_n)+f'(x_n)(x-x_n)
-    \end{cases}
+    \end{cases}$
 \end{center}
 ottenendo la formula iterativa\\
 \begin{equation*}
     x_{n+1}=x_n-\frac{f(x_n)}{f'(x_n)}, n=0,1,2,...
 \end{equation*}
 Ora, come per tutti i metodi che producano una successione, cerchiamo delle condizioni che garantiscano la CONVERGENZA (in questo caso il limite dovrà essere lo zero $\xi$ di $f$).\\
-Ci sono vari set di condizioni SUFFICIENTI che garantiscono la convergenza del metodo di Newton; ne mostriamo uno che assume, oltre alle ipotesi degli zeri, la derivabilità (essenziale perché la curva del grafico ammetta tangente in ogni punto) e la convessità o concavità stretta (tramite il segno di $\sideset{}{''}f$).\\\\
-\textbf{TEOREMA (convergenza del metodo di Newton con $\sideset{}{''}f$ segno costante})\\
-Sia $f \in C^2[a,b]$ (derivabile 2 volte con derivate continue in $[a,b]$), $f(a)f(b)<0$, $\sideset{}{''}f(x)>0 \ \ \forall x \in [a,b]$ (oppure $\sideset{}{''}f(x)<0 \ \ \forall x \in [a,b]$), $x_0$ tali che $f(x_0)f''(x_0)>0$\\
+Ci sono vari set di condizioni SUFFICIENTI che garantiscono la convergenza del metodo di Newton; ne mostriamo uno che assume, oltre alle ipotesi degli zeri, la derivabilità (essenziale perché la curva del grafico ammetta tangente in ogni punto) e la convessità o concavità stretta (tramite il segno di $f''$).\\\\
+\textbf{TEOREMA (convergenza del metodo di Newton con $f''$ segno costante})\\
+Sia $f \in C^2[a,b]$ (derivabile 2 volte con derivate continue in $[a,b]$), $f(a)f(b)<0$, $f''(x)>0 \ \ \forall x \in [a,b]$ (oppure $f''(x)<0 \ \ \forall x \in [a,b]$), $x_0$ tali che $f(x_0)f''(x_0)>0$\\
 $\Rightarrow$ il metodo di Newton è ben definito (cioè $f'(x_n) \neq 0 \ \ \forall n$) e converge all'unico zero $\xi$ di $f$ in $(a,b)$\\\\
 \textbf{Dimostrazione}\\
 ci sono 4 casi possibili in base al segno di $f''$ ovvero
