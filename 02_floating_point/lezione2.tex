@@ -1,0 +1,121 @@
+\documentclass[12pt]{article}
+\DeclareMathSizes{12}{13}{10}{9}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1.5cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm} % allows example and proof environment to be defined/used
+\usepackage{cancel}
+\usepackage{graphicx}
+
+\newtheorem*{esempio}{Esempio}
+
+\begin{document}
+\section*{Lezione 2}
+In questa lezione cominceremo ad occuparci dell'effettivo sistema di rappresentazione dei numeri reali nel calcolatore, ovvero la rappresentazione "floating-point" (virgola mobile) arrivando a definire l'insieme dei "reali-macchina" e il concetto chiave di "precisione di macchina".
+\subsection*{Sistema floating-point}
+Cominciamo con l'osservazione che a partire dalla rappresentazione in base $b$ dei reali vista nella lezione 1, è sempre possibile scrivere $x \in \mathbb{R}$ in base $b$ come 
+\[ \begin{split}
+    x & = sign(x)( \underbrace{0,d_1 d_2 \dotsc d_t \dotsc}_{\text {\underline{mantissa}}} \cdot {\underbrace{b^p}_{\text{\underline{esponente}}}}) \\
+    & = sign(x)\biggl( \sum_{j=1}^t d_j b^{-j} \biggr) \cdot b^p
+\end{split} \]
+$(0,d_1 d_2 \dotsc d_t \dotsc)$ è la "mantissa" e $d_j\, , 1 \le j < \infty$ le cifre della mantissa, $d_j \in {0, 1, \dotsc , b-1}$ e $p \in \mathbb{Z}$ è un intero che viene detto esponente (positivo, nullo o negativo). \\
+Si adotta la convenzione che $d_1 \ne 0$, altrimenti ci sarebbero $\infty$ rappresentazioni dello stesso numero.
+\begin{esempio}
+Base 10
+\[ \begin{split}
+    1 & = (0,100 \dotsc) \cdot 10^1 \\
+    & = (0,0100 \dotsc) \cdot 10^2 \\
+    & = (0,00100 \dotsc) \cdot 10^3 \\
+    & \dotsc
+\end{split}\]
+\end{esempio}
+In questo modo esiste una sola rappresentazione per ogni numero reale (a meno di periodicità sulla cifra massima ad es. $1 = (0,100 \dotsc) \cdot 10^1$ ma anche $1 = (0,\overline{999} \dotsc) \cdot 10^0$). Questa è quella che si chiama la rappresentazione a "virgola mobile" ("floating-point" in inglese) del numero. \\
+Per capire come funziona basta fare un paio di esempi in base 10.
+\begin{esempio}
+\[\begin{split}
+    x & = + \, 1278,3405 \dotsc \\
+    & = + \, (0,12783405 \dotsc) \cdot 10^4 
+\end{split}\]
+\end{esempio}
+Oppure
+\begin{esempio}
+\[\begin{split}
+    x & = - \, 0,0003267 \dotsc \\
+    & = - \, (0,3267 \dotsc) \cdot 10^{-3} 
+\end{split}\]
+\end{esempio}
+Come si vede, semplicemente si \underline{sposta la virgola} con un'opportuna potenza della base. \\
+Osserviamo che la mantissa sta in $(0,1]$, in particolare $\in [0,1 \, , 1]$ (dove 0,1 è inteso in base $b$, cioè $0,1 = 1 \cdot b^{-1}$ e 1 si ottiene con mantissa periodica sulla cifra massima, ad es. $0,\overline{999} \dotsc = 1$ in base 10). \\
+Le cifre della mantissa si chiamano "cifre significative" del numero. \\
+È importante osservare che la mantissa \underline{NON} è la parte frazionaria, chi siano parte intera e parte frazionaria è determinato dall'esponente che sposta la virgola tramite la potenza $b^p$ (a destra per $p>0$ e a sinistra per $p<0$). \\
+È chiaro che in generale un reale ha mantissa infinita, in particolare gli irrazionali hanno mantissa infinita in qualsiasi base (perchè hanno parte frazionaria infinita). \\
+I numeri con \underline{mantissa finita} sono invece \underline{razionali}; che un razionale abbia mantissa finita o meno dipende dalla base, come abbiamo già visto.
+\begin{esempio} \end{esempio}
+\[\frac{1}{3} = 
+\begin{cases}
+    (0,100 \dotsc)_3 \cdot 3^0 & \text{base 3} \\
+    (0,\overline{333} \dotsc)_{10} \cdot 10^0 & \text{base 10} \\
+\end{cases}
+\]
+\newline \newline
+A questo punto siamo in grado di definire l'insieme dei "reali-macchina", che in un sistema di calcolo con una macchina che lavora in base $b$ sono i numeri con una quantità finita di cifre di mantissa e un esponente che varia in un intervallo finito di interi. \\
+Formalmente l'insieme dei reali-macchina è un insieme di razionali definito da 4 parametri: $b$ (la base), $t$ (il numero di cifre della mantissa), $L$ (Lower) e $U$ (Upper) che sono gli estremi dell'intervallo di esponenti interi, dove $L < 0$ e $U > 0$.
+\[ \mathbb{F} (b, t, L, U) = \{ \mu \in \mathbb{Q} \colon \mu = sign(\mu)\cdot(0,\mu_1 \mu_2 \dotsc \mu_t) \cdot b^p \,, \mu_j \in \{0, 1, \dotsc , b-1\} \,, \mu_1 \ne 0 \,, p \in [L,U] \subset \mathbb{Z} \} \]
+$\mathbb{F}$ è l'insieme dei reali-macchina.\\
+Il fatto che il numero di cifre di mantissa sia finito e l'intervallo di esponenti sia finito permette la memorizzazione utilizzando sequenza di bit (e tipicamente base $b=2$). \\
+Per avere un'idea (poi faremo un modellino) con variabili (zone di memoria) a 64 bit per i reali-macchina (come accade ad es. in Matlab) si ha $b=2$, $t=53$ e in un modello semplificato $L=-\,1023$, $U=+\,1023$. In una parte successiva andremo a studiare più in dettaglio la struttura dell'insieme dei reali-macchina.\\
+Qui invece facciamo il passo fondamentale che ci permette di stimare l'ERRORE che si commette approssimando un numero reale con un reale-macchina. Questa approssimazione avviene per arrotondamento della mantissa al numero di cifre disponibili. \\
+Definiamo arrotondamento a $t$ cifre di un numero reale scritto in notazione floating-point \[ x = sign(x)(0,d_1 d_2 \dotsc d_t \dotsc) \cdot b^p \]
+il numero \[ fl^t(x) = sign(x)(0,d_1 d_2 \dotsc \Tilde{d}_t) \cdot b^p \]
+dove la mantissa è stata arrotondata alla $t$-esima cifra
+\[\Tilde{d}_t = 
+\begin{cases}
+    d_t & \text{se $d_{(t+1)} < \frac{b}{2}$} \\
+    d_t+1 & \text{se $d_{(t+1)} \ge \frac{b}{2}$}
+\end{cases}
+\]
+Si tratta a questo punto di stimare l'errore $\lvert \, x - fl^t(x) \, \rvert$.\\
+Ora
+\[ \begin{split}
+    \lvert \, x - fl^t(x) \, \rvert & = \lvert \, (0,d_1 d_2 \dotsc d_t \dotsc) \cdot b^p - (0,d_1 d_2 \dotsc \Tilde{d}_t) \cdot b^p \, \rvert \\
+    & = b^p \cdot \lvert (0,d_1 d_2 \dotsc d_t \dotsc) - (0,d_1 d_2 \dotsc \Tilde{d}_t) \rvert
+    \end{split}\]
+Ma abbiamo già stimato l'errore di arrotondamento a $n$ cifre "dopo la virgola", che è $\le \frac{b^{-n}}{2}$. Quindi sono in grado di stimare la differenza in modulo tra mantissa esatta e mantissa arrotondata (posto $n = t$)
+\[ \lvert \, (0,d_1 d_2 \dotsc d_t \dotsc) - (0,d_1 d_2 \dotsc \Tilde{d}_t) \, \rvert \, \le \, \frac{b^{-t}}{2} \] da cui ricaviamo
+\[ \lvert \, x - fl^t(x) \, \rvert \le b^p \cdot \frac{b^{-t}}{2} = \frac{b^{p-t}}{2} \]
+Notiamo subito un aspetto: l'errore dipende da $p$, cioè dall'ordine di grandezza del numero (in base $b$).\\
+Numeri grandi in modulo ($p$ positivo grande) avranno errori grandi, numeri piccoli in modulo ($p$ negativo e grande in modulo) avranno errori piccoli. \\
+Gli errori diventano addirittura grandissimi o piccolissimi avvicinandosi agli estremi $L$ ed $U$ dell'intervallo di esponenti. \\
+La domanda è: è accettabile una situazione di questo tipo, ovvero un errore variabile con l'ordine di grandezza del numero, nel modo descritto? \\
+La risposta è SI, se ci spostiamo dall'ERRORE ASSOLUTO (che è quello stimato finora) al concetto di ERRORE RELATIVO. \\
+Dati due reali $a$ e $\Tilde{a}$, con $\Tilde{a} \approx a$ ($\Tilde{a}$ che approssima $a$) definiamo:
+\[ \lvert \, a - \Tilde{a} \, \rvert \quad \longrightarrow \quad \text{ERRORE ASSOLUTO}\]
+\[ \frac{\lvert \, a - \Tilde{a} \, \rvert}{\lvert \, a \, \rvert} \, , a \ne 0 \quad \longrightarrow \quad \text{ERRORE RELATIVO} \]
+L'errore relativo è l'errore assoluto su una quantità, \underline{pesato dalla grandezza} della quantità. \\
+È l'errore più importante in campo sperimentale e nelle applicazioni pratiche, l'errore che di solito si esprime in \underline{percentuale}:
+\begin{esempio} \end{esempio}
+Una certa quantità è nota con un errore del $10\%$ (errore relativo $10^{-1}$), oppure dell'$1\%$ (errore relativo $10^{-2}$), oppure dello $0,01\%$ (errore relativo $10^{-4}$)
+\newline \newline
+Nel nostro caso dell'errore di arrotondamento a $t$ cifre di mantissa, scopriremo che l'errore relativo non dipende più da $p$ (cioè dall'ordine di grandezza del numero nella base fissata). Quindi ci interessa ora stimare
+\[ \frac{\lvert \, x - fl^t(x) \, \rvert}{\lvert \, x \, \rvert} \quad \text{per}\quad x \ne 0 \]
+Abbiamo già stimato il numeratore (che è l'errore assoluto di arrotondamento a $t$ cifre di mantissa), dobbiamo quindi stimare (da sopra) \[ \frac{1}{\lvert \, x  \, \rvert} \]
+Per fare questo si stima \underline{da sotto} \[ \lvert \, x \, \rvert \]
+infatti, se \[ \lvert \, x \, \rvert \ge \alpha > 0 \] allora 
+\[ \frac{1}{\lvert \, x \, \rvert} \le \frac{1}{\alpha} \]
+Cerchiamo quindi un tale $\alpha$.
+\[ \lvert \, x \, \rvert = (0,d_1 d_2 \dotsc d_t \dotsc ) \cdot b^p \] dove $d_1 \ne 0$. \\
+Fissato $p$, qual è il valore più piccolo possibile di $\lvert \, x \, \rvert$? \\
+Corrisponde alla mantissa minima che è $0,100 \dotsc = b^{-1}$ quindi
+\[ \lvert \, x \, \rvert \ge b^{-1} \cdot b^p = b^{p-1} \] Otteniamo
+\[ \frac{\lvert \, x - fl^t(x) \, \rvert}{\lvert \, x \, \rvert} \, \le \, \frac{\frac{b^{p-t}}{2}}{b^{p-1}} \,=\, \frac{b^{p-t+1-p}}{2} \,=\, \frac{b^{1-t}}{2} \,=\, \varepsilon_M\]
+
+\subsection*{Precisione di macchina}
+La quantità $\varepsilon_M$, che si chiama PRECISIONE DI MACCHINA, è il parametro chiave del sistema floating-point, inteso come insieme dei reali-macchina e della sua capacità di approssimazione. \\
+In sintesi, possiamo dire che la precisione di macchina è il massimo errore \underline{relativo} di arrotondamento a $t$ cifre di mantissa e dipende \underline{solo} da $b$ e \underline{da $t$} o, in altre parole, è la massima distanza relativa dal reale-macchina più vicino, distanza relativa che \underline{non} dipende dall'ordine di grandezza del numero. \\
+Come vedremo, non tutti i reali sono approssimabili con un reale-macchina, perchè il range di esponenti è finito. Ciononostante, su ogni reale approssimabile si fa un errore che non supera la precisione di macchina. \\
+Nel sistema floating-point a 64 bit \[ \varepsilon_M = \frac{2^{1-53}}{2} = 2^{-53}\] 
+è una quantità piccolissima ($\approx 10^{-16}$). \\
+Osserviamo qui che useremo il simbolo "$\approx$", che significa "\textit{circa uguale}", sia nel senso di approssimazione con errore "piccolo" sia nel senso di approssimazione dell'ordine di grandezza (come l'abbiamo appena usato qui sopra, per indicare che $\varepsilon_M = 2^{-53}$ è dell'ordine di $10^{-16}$). \\
+Nella prossima lezione studieremo la struttura dell'insieme $\mathbb{F}(b, t, L, U)$.
+\end{document}
