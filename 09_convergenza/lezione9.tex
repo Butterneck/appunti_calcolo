@@ -33,7 +33,7 @@ Per trovare l'espressione analitica delle iterazioni, calcoliamo lo zero della r
 \end{center}
 dove stiamo usando l'interpretazione geometrica della derivata nel punto $x_0$ come coefficiente angolare della retta tangente nel corrispondente punto del grafico di $f$. Otteniamo l'equazione 
 \begin{equation*}
-    o=f(x_0)+ f'(x_0)(x-x_0)
+    0=f(x_0)+ f'(x_0)(x-x_0)
 \end{equation*}
 la cui soluzione è
 \begin{equation*}
@@ -79,7 +79,7 @@ Ma se $x_n \in (\xi, b]$ allora $f'(x_n) > 0$ e $f(x_n) > 0$, quindi $x_{n+1}$ s
 D'altra parte f è strettamente convessa, il che è equivalente a dire che la tangente sta "sotto al grafico" $\forall x \in [a,b]$ ma allora la tangente in un punto $\in (\xi, b]$ interseca l'asse $x$ a destra di $\xi$, cioè se $x_n \in (\xi, b]$ anche $x_{n+1} \in (\xi, b]$\\
 In definitiva, abbiamo provato che la successione $\{x_n\}$ è decrescente e che $x_n > \xi$ $\forall n$\\
 Dall'analisi matematica è noto che una successione monotona e limitata ha limite e che il limite è $sup\{x_n\}$ se è crescente e $inf\{x_n\}$ se è decrescente (che corrisponde al nostro caso). \\
-Quindi $ \exists \lim_{n \to \infty} x_n = inf\{x_n\} = \eta $, con $\eta \geq \xi$. Ricordiamo infatti che le disuguaglianze conservano il verso passando al limite oppure fancendo $sup$ e $inf$ (le disgiunzioni strette possono diventare non strette, ma nello stesso verso:
+Quindi $ \exists \lim_{n \to \infty} x_n = inf\{x_n\} = \eta $, con $\eta \geq \xi$. Ricordiamo infatti che le disuguaglianze conservano il verso passando al limite oppure facendo $sup$ e $inf$ (le disgiunzioni strette possono diventare non strette, ma nello stesso verso:
 \begin{equation*}
 \begin{split}
 	& x_n \geq \alpha \Rightarrow \lim, \inf, \sup x_n \geq \alpha \\ &
@@ -99,9 +99,9 @@ Per concludere la dimostrazione basta passare al limite della formula che defini
 \end{equation*}
 dove abbiamo usato le proprietà dei limiti e la continuità di f ed f' (portando il limite "dentro le funzioni"). Quindi 
 \begin{equation*}
-	\eta=\eta-\frac{f(n)}{f'(n)} \quad \text{ con } f'(n) \neq 0 \Rightarrow \frac{f(\eta)}{f'(\eta)} = 0 \Rightarrow f(\eta)=0
+	\eta=\eta-\frac{f(\eta)}{f'(\eta)} \quad \text{ con } f'(\eta) \neq 0 \Rightarrow \frac{f(\eta)}{f'(\eta)} = 0 \Rightarrow f(\eta)=0
 \end{equation*}
-Ma allora $\eta=\xi$, perchè nelle ipotesi fatte (teorema degli zeri e $f''$ di segno costante) lo zero è unico, quindi il metodo di Newton è ben definito e $\{x_n\}$ converge a $\xi$.\\
+Ma allora $\eta=\xi$, perché nelle ipotesi fatte (teorema degli zeri e $f''$ di segno costante) lo zero è unico, quindi il metodo di Newton è ben definito e $\{x_n\}$ converge a $\xi$.\\
 Infine, osserviamo che anche nel caso (3), con $x_0 \in [a,\xi)$ si ottiene $\xi= \inf\{x_n\}=\lim x_n$ mentre nei casi (2) e (4) con $x_0 \in [a,\xi)$ si ottiene $\xi= \sup x_n=lim x_n.$ \\\\
 E' il caso di ribadire che quello che abbiamo utilizzato è uno dei vari set di condizioni sufficienti (ce ne sono altri), con ipotesi tipicamente di tipo "geometrico" (qui segno costante di $f''$ quindi $f$ è strettamente convessa o concava) che garantiscono una convergenza che possiamo chiamare "globale" (cioè non è importante quanto il punto iniziale $x_0$ sia vicino allo zero, purché sia nella zona giusta dell'intervallo)\\
 Vedremo che il metodo di Newton può convergere anche con condizioni meno forti, purché $x_0$ sia scelto in un intorno opportuno di $\xi$ (convergenza che chiameremo "locale").\\
@@ -151,7 +151,7 @@ dove $z_n\in int(x_n,\xi)\subset [c,d]$ e $f(\xi)=0$, da cui
 ma dalla definizione del metodo
 \[-\frac{f(x_n)}{f'(x_n)}=x_{n+1}-x_n\]
 che inserita nella formula di Taylor porta a 
-\[x_{n+1}-\not{x_n }=\xi-\not{x_n}+\frac{f''(z_n)}{2}(\xi-x_n)^2\]
+\[x_{n+1}-\not{x_n }=\xi-\not{x_n}+\frac{f''(z_n)}{2\cdot f'(x_n)}(\xi-x_n)^2\]
 ovvero mettendo i moduli
 \[e_{n+1}=|x_{n+1}-\xi|=c_ne_n^2\]
 con $ c_n=\frac{1}{2}\frac{|f''(z_n)|}{|f'(x_n)|}$\\
