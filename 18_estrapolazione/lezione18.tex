@@ -1,0 +1,495 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1.5cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm} 
+\usepackage{cancel}
+\usepackage{graphicx}
+\usepackage{mathtools}
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\newcommand{\inter}{\begin{matrix}\prod\end{matrix}}
+ 
+\begin{document}
+\section*{LEZIONE 18}
+\subsection*{Estrapolazione: struttura asintotica dell'errore, metodo di estrapolazione di Richardson. Applicazione a derivazione e integrazione numerica}
+
+PAGINA 1\\%mike
+Nella scorsa lezione abbiamo affrontato il problema del calcolo approssimato della derivata tramite formule di derivazione numerica costruite con rapporti incrementali.\\Chaimando $\phi(h)$ una di queste\\
+
+PAGINA 2\\%mike
+formule e $\tilde{\phi}(h)$ la formula in cui si usano i dati realmente misurati, cioè valori $\tilde{f}(t)$ con $|\tilde{f}(t)-f(t)|\leq\varepsilon$, abbiamo visto che
+\begin{equation*}
+    |\tilde{\phi}(h)-f'(x)|=O(h^p)+O(\frac{\varepsilon}{h})
+\end{equation*}
+(con $p=1$ per $\phi(h)=\delta_+(h)$ rapporto incrementale standard e $p=2$ per $\phi(h)=\delta(h)$ rapporto incrementale simmetrico), dove l'instabilità della formula per $\varepsilon$ fissato e $h\rightarrow0$.\\
+
+PAGINA 3\\%mike
+Abbiamo anche visto che ottimizzando il passo $h$ in funzione di $\varepsilon$, le formule con $p$ più grande "soffrono meno" dell'instabilità. \\In questa lezione vedremo come usare una struttura asintotica più fine nell'errore teorico per 2 scopi:
+\begin{itemize}
+    \item stimare a posteriori l'errore
+    \item aumentare a costo computazione basso l'ordine d'infinitesimo $p$ dell'errore
+\end{itemize}
+
+PAGINA 4\\%mike
+Cominciamo con $\phi(h)=\delta_+(h)$ assumendo che $f\in C^3(I_r$ dove $I_r=I_r(x)=[x-r,x+r]$ è un intorno chiuso di $x$. Usando la formula di Taylor di grado 2 in $h$ con resto in forma di Lagrange
+\begin{equation*}
+    f(x+h)=f(x)+hf'(x)+h^2\frac{f''(x)}{2}+h^3\frac{f'''(z)}{6}
+\end{equation*}
+con $z\in (x,x+h)$, da cui 
+\begin{equation*}
+    \delta_+(h)=\frac{f(x+h)-f(x)}{h}=f'(x)+h\frac{f''(x)}{2}+h^2\frac{f'''(z)}{6}=f'(x)+h\frac{f''(x)}{2}+O(h^2)
+\end{equation*}
+PAGINA 5\\%mike
+Si vede quindi che chiedendo maggiore regolarità ad $f$, l'errore $\delta_+(h)-f'(x)$ ha una struttura asintotica del tipo
+\begin{equation*}
+    \delta_+(h)-f'(x)=ch+O(h^2)
+\end{equation*}
+\begin{equation*}
+    c=\frac{f''(x)}{2}
+\end{equation*}
+Ovviamente $\delta_+(h)-f'(x)=O(h)$ ma siamo riusciti a dare una struttura più fine al termine $O(h)$ come somma di un termine proporzionale ad $h$ + un infinitesimo di ordine 2 in $h$.\\
+PAGINA 6\\%mike
+\textbf{1) \underline{Stima a posteriori} dell'errore}
+\\Cerchiamo di utilizzare la struttura asintotica per stimare la "\underline{parte principale}" dell'errore, cioè il termine $ch$, partendo dal presupposto che non conosciamo $f''(x)$ e quindi non conosciamo $c$; del resto, se stiamo cercando di approssimare $f'(x)$ con $\delta_+(h)$ non è ragionevole pensare di avere informazioni quantitative su derivate di ordine superiore.\\Useremo invece in modo\\
+PAGINA 7\\%mike
+sostanziale l'informazione qualitativa che $f\in C^3$ e quindi che esiste la struttura asintotica indicata.\\L'idea è semplice: calcolando la formula con un passo più piccolo (ad esempio $\frac{h}{2}$ che è la scelta usuale) abbiamo 
+\begin{equation*}
+    \delta_+\biggl(\frac{h}{2}\biggr)=f'(x)+\frac{f''(x)}{2}\frac{h}{2}+O(h^2)
+\end{equation*}
+visto che se $u(h)=O(h^2)$ allora $u(\frac{h}{2})$ è ancora $O(h^2)$ (qui $u(h)=\delta_+(\frac{h}{2})-f'(x)-\frac{f''(x)}{2}h$).\\
+PAGINA 8 \\%Alessandro
+Infatti $|u(h) \leq \gamma h^2|$ con $\gamma$ indipendente da $h$, quindi $|u\bigl(\frac{h}{2}\bigr)| \leq \gamma \bigl(\frac{h}{2}\bigr)^2 = \frac{\gamma}{4}h^2=O(h^2)$.\\
+Ma allora sottraendo membro a membro
+\begin{equation*}
+    \begin{split}
+        \delta_+(h)-\delta_+ \biggl(\frac{h}{2}\biggr) & = \cancel{f'(x)}+\frac{f''(x)}{2}h + O(h^2) - \bigl( \cancel{f'(x)} + \frac{f''(x)}{2}\frac{h}{2} + O(h^2) \bigr) \\
+        & = \frac{f''(x)}{2}\biggl(h-\frac{h}{2}\biggr) + O(h^2) - O(h^2) \\
+        & = \frac{f''(x)}{2}\frac{h}{2}+O(h^2)
+    \end{split}
+\end{equation*}
+perché somma o differenza di due termini che sono\\
+PAGINA 9 \\%Alessandro
+$O(h^2)$ resta un $O(h^2)$.\\
+Infatti se $u(h)=O(h^2)$ e $v(h)=O(h^2)$, cioè $\exists \gamma_1, \gamma_2 > 0$ tali che $|u(h)|\leq \gamma_1 h^2$ e $|v(h)|\leq \gamma_2 h^2$, allora
+\begin{equation*}
+    \begin{split}
+        & |u(h) \pm v(h)| \underset{\text{diseg. triangolare}}{\leq} |u(h)|+|v(h)| \\
+        & \leq \gamma_1 h^2 + \gamma_2 h^2 = (\gamma_1 + \gamma_2) h^2
+    \end{split}    
+\end{equation*}
+Abbiamo ottenuto
+\begin{equation*}
+    \delta_+(h) - \delta_+\biggl(\frac{h}{2}\biggr) = \frac{f''(x)}{2}\frac{h}{2} + O(h^2)
+\end{equation*}
+e sappiamo che 
+\begin{equation*}
+    \delta_+\biggl(\frac{h}{2}\biggr) - f'(x) = \frac{f''(x)}{2}\frac{h}{2} + O(h^2)
+\end{equation*}
+PAGINA 10 \\%Alessandro
+Trascurando i termini $O(h^2)$ (visto che per $h$ piccolo il termine lineare in $h$ sarà dominante nell'errore)
+\begin{equation*}
+    \biggl|\delta_+(h) - \delta_+\biggl(\frac{h}{2}\biggr)\biggr| \approx \biggl|\frac{f''(x)}{2}\frac{h}{2}\biggr| \approx \biggl|\delta_+\biggl(\frac{h}{2}\biggr) - f'(x) \biggr|
+\end{equation*}
+cioè abbiamo ricavato una stima \underline{a posteriori} (con le quantità calcolate) dell'errore commesso approssimando $f'(x)$ con $\delta_+\bigl(\frac{h}{2}\bigr)$ (che è tendenzialmente più accurato di $\delta_+(h)$)
+\begin{equation*}
+     \biggl|f'(x) - \delta_+\biggl(\frac{h}{2}\biggr) \biggr| \underset{\text{stima a posteriori}}{\approx} \biggl|\delta_+(h) - \delta_+\biggl(\frac{h}{2}\biggr)\biggr|
+\end{equation*}
+PAGINA 11\\ %Alessandro
+\textbf{2) \underline{Aumento} dell'\underline{ordine} di infinitesimo dell'\underline{errore}}\\
+\\
+Ripartiamo dalla struttura asintomatica:
+\begin{equation*}
+    \begin{split}
+        & \delta_+(h) = f'(x) + \frac{f''(x)}{2}h + O(h^2) \\
+        & \delta_+\biggl(\frac{h}{2}\biggr) = f'(x) + \frac{f''(x)}{2}\frac{h}{2} + O(h^2)
+    \end{split}
+\end{equation*}
+Nel punto precedente sottraendo membro a membro abbiamo messo in evidenza la parte principale dell'errore, sfruttando la struttura asintotica.\\
+Adesso sfruttiamo di nuovo la struttura asintotica, stavolta
+
+PAGINA 12\\%Alessandro
+per \underline{eliminare} la \underline{parte principale} dell'errore e arrivare ad una formula con errore di \underline{ordine superiore} come infinitesimo in $h$
+\begin{equation*}
+    \begin{split}
+        & \delta_+(h) = f'(x) + \frac{f''(x)}{2}h + O(h^2) \\
+        & 2\delta_+\biggl(\frac{h}{2}\biggr) = 2f'(x) + \frac{f''(x)}{2}\xcancel{2}\frac{h}{\xcancel{2}} + O(h^2)
+    \end{split}
+\end{equation*}
+quindi
+\begin{equation*}
+    \begin{split}
+        2\delta_+ \biggl(\frac{h}{2}\biggr) - \delta_+(h) & = 2f'(x)+\bcancel{\frac{f''(x)}{2}h} + O(h^2) - \bigl(f'(x) + \bcancel{\frac{f''(x)}{2}h} + O(h^2) \bigr) \\
+        & = 2f'(x) - f'(x) + O(h^2) - O(h^2) \\
+        & = f'(x)+O(h^2)
+    \end{split}
+\end{equation*}
+PAGINA 13 \\% Alessandro
+(si noti che abbiamo usato il fatto che $2O(h^2) = O(h^2) : |u(h)|\leq\gamma h^2 \Rightarrow |k\cdot u(h)|\leq k\cdot\gamma h^2$).\\
+In definitiva:
+\begin{equation*}
+    \phi_1(h) = 2\delta_+ \biggl(\frac{h}{2}\biggr) - \delta_+(h) = f'(x)+O(h^2)
+\end{equation*}
+cioè con una semplice speciale \underline{combinazione lineare} delle formule con peso $h$ e $\frac{h}{2}$ abbiamo ricavato una \underline{nuova formula} con errore $O(h^2)$
+
+PAGINA 14 \\%Alessandro
+invece di $O(h)$.\\
+\vspace{0.1cm}\\
+Questa tecnica si chiama "ESTRAPOLAZIONE" e vedremo tra poco che è generalizzabile a tutte le formule in cui l'errore è dotato di una struttura asintotica.\\
+\vspace{0.1cm}\\
+Come primo esempio, pensiamo di calcolare la derivata di $f(x)=e^x$ in $x=0$, $f'(0)=e^0=1$ utilizzando $\delta_+(h)$, $\delta_+\bigl(\frac{h}{2}\bigr)$ e $\phi_1(h)$ con $h=\frac{1}{10}$
+
+PAGINA 15 \\ % michele
+\[
+\begin{split}
+    \delta_+ (h) & = \frac{e^h - e^0}{h} = \frac{e^{1/10} - 1}{1/10} = 1.0517 \dotso 7 \\
+    \delta_+ (\frac{h}{2}) & = \frac{e^{1/20} - 1}{1/20} = 1.0254 \dotso 2 \\
+    \phi_1 (h) & = 2 \cdot \delta_+ (h/2) - \delta_+ (h) = 0.99913 \dotso 5
+\end{split}
+\]
+Guardando gli errori (arrotondati alla seconda cifra)
+\[
+\begin{split}
+    \abs{\delta_+ (h) - f'(0)} & \approx 0.5 \cdot 10^{-2} \\
+    \abs{\delta_+ (h/2) - f'(0)} & \approx 0.25 \cdot 10^{-2} \\
+    \abs{\phi_1 (h) - f'(0)} & \approx 0.87 \cdot 10^{-3}
+\end{split}
+\]
+Si noti il miglioramento ottenuto con $\phi_1 (h)$, che ha un
+
+PAGINA 16 \\ % michele
+errore paragonabile a quello ottenibile con $\delta (h) = f'(0) + O(h^2)$
+\[
+\abs{\delta (h) - f'(0)} = \abs{\frac{e^h - e^{-h}}{2h} - 1} \approx 1.7 \cdot 10^{-3}
+\]
+Si noti anche che la stima a posteriori dell'errore commesso con $\delta_+ (h/2)$ è molto accurata.\\
+A questo punto possiamo descrivere l'estensione a strutture asintotiche generali del metodo di stima a posteriori e del metodo di estrapolazione.\\
+
+PAGINA 17 \\ % michele
+\textbf{STRUTTURA ASINTOTICA}\\
+Considerimao una formula $\phi (h)$ dipendente da un parametro $h>0$ (tipicamente un passo di discretizzazione) che approssima una quantità $\alpha \in \mathbb{R}$ con un errore $O(h^p)$, $p>0$, e che ha la seguente struttura asintotica
+\[
+\phi (h) = \alpha + ch^p + O(h^q), \quad q>p>0
+\]
+dove $c \in \mathbb{R}$ è indipendente da $h$, cioè l'errore è un infinitesimo di ordine $p$ per $h \to 0$,
+
+PAGINA 18 \\ % michele
+che è la somma di un termine proporzionale ad $h^p$ e di un termine che è infinitesimo di ordine $q>p$ per $h \to 0$.\\
+Osserviamo che stiamo assumendo che esista questa struttura con $p$ e $q$ noti, ma che la costante $c$ non è nota (si pensi al caso di $\delta_+ (h)$ con $f \in C^3$, in cui da Taylor si sa che $p=1$, $q=2$ ma $c = f''(x)/2$ non è supposto nota).\\
+Possiamo fare altri due esempi
+
+PAGINA 19-20 \\ % michele
+importanti per la derivazione numerica e per l'integrazione numerica, in cui la formula $\phi (h)$ è di tipo molto diverso ma la struttura asintotica è esattamente la stessa.\\
+Il secondo esempio è la formula $\phi (h) = \delta (h)$ (rapporto incrementale simmetrico) con $f \in C^5$.\\
+\[
+\begin{split}
+f(x+h) & = f(x) + hf'(x) + h^2 \frac{f''(x)}{2} + h^3 \frac{f'''(x)}{3!} + h^4 \frac{f^{(4)}(x)}{4!} + h^5 \frac{f^{(5)} (z)}{5!}, \quad z \in int(x, x+h) \\
+f(x-h) & = f(x) - hf'(x) + h^2 \frac{f''(x)}{2} - h^3 \frac{f'''(x)}{3!} + h^4 \frac{f^{(4)} (x)}{4!} - h^5 \frac{f^{(5)} (\xi)}{5!}, \quad \xi \in int(x-h, x)
+\end{split}
+\]
+Allora
+\[
+\delta (h) = \frac{f(x+h) - f(x-h)}{2h} = f'(x) + h^2 \frac{f'''(x)}{6} + h^4 \frac{f^{(5)} (z) + f^{(5)} (\xi)}{2 \cdot 5!} = f'(x) + h^2 \frac{f'''(x)}{6} + O(h^4)
+\]
+che è del tipo $\phi (h) = \alpha + ch^p + O(h^q)$ con $\phi (h) = \delta (h)$, $\alpha = f'(x), \  p=2, \ c=f'''(x)/6, \ q=4$
+
+PAGINA 21 \\ % michele
+Il terzo esempio è invece la formula di quadratura composta dei trapezi con passo costante
+\[
+h = \frac{b-a}{n}, \quad x_i = a + ih, \quad 0 \le i \le n
+\]
+\[
+I_n^{trap} (f) = \frac{h}{2} (f(x_0) + f(x_n)) + h \cdot \sum_{i=1}^{n-1} f(x_i)
+\]
+È possibile dimostrare (accettiamo il risultato, che è una conseguenza della "formula di sommaziione di Eulero - Maclaurin") che se $f \in C^4$
+\[
+I_n^{trap} (f) = I(f) + ch^2 + O(h^4)
+\]
+
+PAGINA 22 \\ % michele
+dove $I(f) = \int_a^b f(x) dx$ e $c$ è una costante dipendente da $f$.\\
+Di nuovo, abbiamo una struttura asintotica come quella scritta sopra con $\phi (h) = I_n^{trap} (f), \ \alpha = I(f), \ p=2$ e $q=4$.\\
+Qui stiamo approssimando un integrale e non una derivata, la formula è una somma pesata e non un rapporto incrementale, ma la struttura di $I_n^{trap} (f) - I(f)$ è esattamente la stessa di $\delta (h) - f'(x)$ (si noti che compaiono solo le potenze pesi di $h, \ p=2$ e $q=4$).
+
+PAGINA 23 \\ % michele
+\textbf{STIMA A POSTERIORI DELL'ERRORE}\\
+Partiamo da
+\[
+\phi (h) = \alpha + ch^p + O(h^q), \quad p>q>0
+\]
+e calcoliamo
+\[
+\phi (h/2) = \alpha + c(\frac{h}{2})^p + O(h^q)
+\]
+Allora
+\[
+\begin{split}
+\phi (h) - \phi (h/2) & = ch^p - c \cdot \frac{h^p}{2^p} + O(h^q) \\
+& = ch^p (1 - \frac{1}{2^p}) + O(h^q) \\
+& = c(\frac{h}{2})^p (2^p-1) + O(h^q)
+\end{split}
+\]
+da cui
+\[
+\frac{\phi (h) - \phi (h/2)}{2^p - 1} = c(\frac{h}{2})^p + O(h^q)
+\]
+
+PAGINA 24 \\ % michele
+D'altra parte
+\[
+\phi (h/2) - \alpha = c(\frac{h}{2})^p + O(h^q)
+\]
+quindi trascurando i termini $O(h^q)$ otteniamo una stima della \underline{parte principale} dell'errore commesso con passo $h/2$
+\[
+\frac{\abs{\phi (h) - \phi (h/2)}}{2^p-1} \approx \abs{c} \cdot (\frac{h}{2})^p \approx \abs{\alpha - \phi (h/2)}
+\]
+(volendo, possiamo pensare che stiamo in sostanza stimando anche la costante $\abs{c}$ che non conosciamo).\\
+Abbiamo già fatto un esempio
+
+PAGINA 25 \\ % michele
+di applicazione di questa stima a $\phi (h) = \delta_+ (h) \ (p=1, \ q=2)$ nel calcolo di $f'(0) = 1$ con $f(x) = e^x$.\\
+Se la applichiamo a
+\[
+\phi (h) = \delta (h) = \frac{(e^h - e^{-h})}{2h} \quad \text{con } h=\frac{1}{10}
+\]
+otteniamo ($p=2, q=4$)
+\[
+\frac{\abs{\delta (h) - \delta (h/2)}}{3} \approx 4.169 \cdot 10^{-4}
+\]
+che è vicinissima all'errore effettivo
+\[
+\abs{\delta (h/2) - 1} \approx 4.167 \cdot 10^{-4}
+\]
+(qui abbiamo arrotondato errore e stima alla quarta cifra).\\
+
+PAGINA 26\\%mike
+Nel caso della formula dei trapezi, proviamo a calcolare 
+\begin{equation*}
+    I(f)=\int_0^1e^{-t^2}dt=\frac{\sqrt{\pi}}{2}erf(1)=0.7468241328124270
+\end{equation*}
+(valore ottenuto con la $erf(x)$ del Matlab); ricordiamo che la gaussiana $f(x)=e^{-x^2}$ è una di quelle funzioni la cui primitiva non è esprimibile elementarmente.\\Osserviamo che in generale 
+\begin{equation*}
+    \phi(h)=I_n^{trap}(f)\  \  \  \  \ e \  \  \  \  \ \phi(\frac{h}{2})=I_{2n}^{trap}(f)
+\end{equation*}
+Per $n=4$ $(h=\frac{1}{4},\frac{h}{2}=\frac{1}{8})$ otteniamo
+\begin{equation*}
+    |I_8^{trap}(f)-I(f)|\approx3.84\cdot 10^{-3}
+\end{equation*}
+PAGINA 27\\%mike
+che è stimato molto bene da
+\begin{equation*}
+    \frac{|I_4^{trap}(f)-I_8^{trap}(f)|}{3}\approx3.87\cdot 10^{-3}
+\end{equation*}
+(qui abbiamo arrotondato errore e stima alla terza cifra)\\
+--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.--.\\
+\begin{center}
+    
+        \textbf{ESTRAPOLAZIONE DI RICHARDSON}
+\end{center}
+Partiamo nuovamente dalla struttura asintotica
+\begin{equation*}
+    \phi(h)=\alpha+ch^p+O(h^q),\  \  \ q>p>0
+\end{equation*}
+e calcoliamo 
+\begin{equation*}
+    \phi(\frac{h}{2}=\alpha+c(\frac{h}{2})^p+O(h^q)
+\end{equation*}
+Stavolta lo scopo è di eliminare la parte principale dell'errore\\
+PAGINA 28\\
+ottenendo una formula il cui errore è $O(h^q)$ invece di $O(h^p)$.\\Basta osservare che
+\begin{equation*}
+    2^p\phi(\frac{h}{2})=2^p\alpha+ch^p+O(h^q)
+\end{equation*}
+da cui
+\begin{equation*}
+    2^p\phi(\frac{h}{2})-\phi(h)=(2^p-1)\alpha+O(h^q)
+\end{equation*}
+e quindi
+\begin{equation*}
+    \phi_1(h)=\frac{2^p\phi(\frac{h}{2}-\phi(h)}{2^p-1}=\alpha+O(h^p)
+\end{equation*}
+Questa idea semplice ma molto efficace è alla base del metodo di \underline{ESTRAPOLAZIONE DI RICHARDSON} e della costruzione delle cosiddette\\
+PAGINA 29\\
+"tabelle di estrapolazione" che descriveremo dopo in tutta generalità.\\Facciamo invece subito i 2 esempi con $\phi(h)=\delta(h)$, $\alpha=f'(x)$ per $f\in C^5$ e $\phi(h)=I_n^{trap}(f)$, $\alpha=I(f)$ per $f\in C^4$, in entrambi i quali $p=2$ e $q=4$.\\Nel caso di $\delta(h)$ prendiamo di nuovo il calcolo approssimato di $f'(0)=1$ per $f(x)=e^x$ con $h=\frac{1}{10}$: si ha che 
+\begin{equation*}
+    |\delta(\frac{h}{2})-f'(0)|\approx4.2\cdot 10^{-4}
+\end{equation*}
+PAGINA 30 \\%silvia
+mentre con l'estrapolazione
+\[\phi_1(h) = \frac{4\delta \left( \frac{h}{2} \right) - \delta(h)}{3}\] e
+\[ \abs*{\phi_1 \left(\frac{1}{10}\right) - f'(0)} \approx 2.1 \cdot 10^{-7}\]
+che mostra un nettissimo miglioramento dell'errore. \\
+Per avere un errore dello stesso ordine di grandezza con $\delta(h)$ dovremmo prendere un passo $h = 10^{-3}$ ottenendo
+\[ \abs*{\delta \left(10^{-3}\right) - f'(0)} \approx 1.7 \cdot 10^{-7}\]
+Qui $f$ è calcolata in sostanza alla precisione di macchina,
+
+PAGINA 31 \\%silvia
+perchè stiamo usando la funzione predefinita \texttt{exp} del Matlab.\\
+Ma se $f$ fosse campionata con un errore di misura $\varepsilon$, sappiamo che
+\[\begin{split}
+    \abs{\tilde{\delta}(h) - f'(0)} & \le \abs{\delta(h) - f'(0)} + \abs{\delta(h) - \tilde{\delta}(h)} \\
+    & \approx 1.7 \cdot 10^{-7} + \frac{\varepsilon}{h} \\
+    & = 1.7 \cdot 10^{-7} + 1000 \cdot \varepsilon
+\end{split}\]
+Invece non è difficile far vedere (non richiesto) che usando $\tilde{\delta}(h)$ si calcola $\tilde{\phi}_1 (h)$ con
+\[\begin{split}
+    \abs{\tilde{\phi}_1 (h) - \phi_1(h)} & \le \frac{2^{p+1} - 1}{2^p-1}\cdot \frac{\varepsilon}{h} \\
+    & = \frac{7}{3} \cdot \frac{\varepsilon}{h} \\
+    & \approx 2.3 \cdot \frac{\varepsilon}{h}
+\end{split}\]
+
+PAGINA 32 \\%silvia
+quindi con $h=\frac{1}{10}$
+\[\begin{split}
+    \abs{\tilde{\phi}_1 (h) - f'(0)} & \le \abs{\phi_1(h) - f'(0)} + \abs{\tilde{\phi}_1 (h) - \phi_1(h)} \\
+    & \lesssim 2.1 \cdot 10^{-7} + 23 \cdot\varepsilon 
+\end{split}\]
+Si vede quindi che l'instabilità dovuta al termine $\frac{\varepsilon}{h}$ viene gestita molto meglio a parità di errore sul primo addendo (errore che è $\approx 2 \cdot 10^{-7}$), perchè $\varepsilon$ viene moltiplicato circa per 20 invece che per 1000, con un'amplificazione ben 50 volte più bassa. \\
+Cioè stiamo vedendo in azione
+
+PAGINA 33 \\%silvia
+il vantaggio già discusso di avere una formula di derivazione approssimata in cui l'errore teorico è un infinitesimo di ordine più alto in $h$, in questo caso $h^4$ invece di $h^2$.\\
+Nel caso dell'esempio con la formula dei trapezi composta, abbiamo che
+\[\phi_1(h) = \frac{4 \cdot I_{2n}^{trap}(f) - I_n^{trap}(f)}{3}\]
+quindi scegliendo $n = 4$ nel calcolo
+\[I(f) = \int_0^1 e^{-t^2} dt = \frac{\sqrt{\pi}}{2} erf (1)\]
+abbiamo $h = \frac{1}{4}$ e otteniamo
+
+PAGINA 34 \\%silvia
+\[\abs{\phi_1(h) - I(f)} \approx 3.1 \cdot 10^{-5}\]
+Per avere un errore dello stesso ordine di grandezza con 
+\[\phi(h) = I_n^{trap} (f)\]
+si dovrebbe prendere $n=42$ ($h=\frac{1}{42}$) ottenendo
+\[\abs{I_{42}^{trap}(f) - I(f)} \approx 3.5 \cdot 10^{-5}\]
+Possiamo cercare di ottenere anche errori molto più piccoli.\\
+Ad esempio per $n=6000$ otteniamo
+\[\abs{\phi_1(h) - I(f)} \approx 4.6 \cdot 10^{-15}\]
+mentre serve $n = 10^6$ per avere
+\[\abs{I_{10^6}^{trap}(f) - I(f)} \approx 6.1 \cdot 10^{-15}\]
+
+PAGINA 35\\ %Simone
+Cioè l'errore che si ottiene con la formula di base sommando un milione di termini è circa quello che si ottiene sommandone 6000 e  12000 e applicando la semplice formuletta di estrapolazione (con un evidente guadagno di costo computazionale).\\
+Ma si può fare molto meglio quando la struttura asintotica è più ``lunga", costruendo una ``tabella di estrapolazione" (la sezioe che segue è facoltatica).\\\\
+
+
+PAGINA 36 %Simone
+\fbox{TABELLE DI ESTRAPOLAZIONE}\\
+Supponiamo che esista una sequenza di esponenti $ 0<p_1<p_2<...<p_m<p_{m+1}$ tali che:
+\[ \begin{split}
+	\phi(h)=\alpha+c_1h^{p_1}+...+c_mh^{p_m}+O(h^{p_{m+1}})
+\end{split} \]
+Allora calcolando
+\[ \begin{split}
+	\phi_1(h)=\dfrac{2^{p_1}\cdot \phi\left( \dfrac{h}{2} \right)-\phi (h) }{2^p-1}
+\end{split} \]
+Si elimina il termine proporzionale a $h^{p_1}$ e si ottiene:
+\[ \begin{split}
+	\phi(h)=\alpha+c_{2,1}h^{p_2}+...+c_{m,1}h^{p_m}+O(h^{p_{m+1}})
+\end{split} \]
+che ha la stessa strutture con
+
+
+PAGINA 37 %Simone
+nuovi coefficienti ed esponenti $\geq p_2$. Combinando $\phi_1(h)$ e $\phi_1 \left( \dfrac{h}{2} \right)$ (quest'ultimo richiede $\phi \left( \dfrac{h}{2} \right)$ e $\phi \left( \dfrac{h}{4} \right)$) si può eliminare il termine proporzionale ad $h^{p_2}$. Infatti:
+\[ \begin{split}
+	\phi_2(h)=\dfrac{2^{p_2}\cdot \phi_1\left( \dfrac{h}{2} \right) -\phi_1 (h)}{2^{p_2}-1}
+\end{split} \]
+ha la struttura
+\[ \begin{split}
+	\phi(h)=\alpha+c_{3,2}h^{p_3}+...+c_{m,2}h^{p_m}+O(h^{p_{m+1}})
+\end{split} \]
+La costruzione può essere ripetuta $m$ volte con la formula iterativa:
+
+
+PAGINA 38 %Simone
+\[ \begin{split}
+	\phi_i(h)=\dfrac{2^{p_i}\cdot \phi_{i-1} \left( \dfrac{h}{2} \right) -\phi_{i-1} (h)}{2^{p_i}-1}, \quad i=1,2,...,m
+\end{split} \]
+(posto $\phi_0(h)=\phi(h)$) con  $\phi_i(h)=\alpha + O(h^{p_{i+1}})$
+\[ \begin{split}
+	=\alpha+c_{i,i+1}h^{p_{i+1}}+...+c_{i,m}h^{p_m}+O(h^{p_{m+1}})
+\end{split} \]
+(e alla fine $\phi_m(h)=\alpha + O(h^{p_{m+1}})$).\\
+Per questo calcolo conviene organizzare una tabella:
+\[ \begin{split}
+	& \underline{O(h^{p_{1}}) \quad O(h^{p_{2}}) \quad O(h^{p_{3}}) \quad O(h^{p_{4}}) \quad O(h^{p_{5}}) \quad} \\
+	& \phi(\overline{h})\\
+	& \phi (\overline{h}/2) \quad \phi_1 (\overline{h})\\
+	& \phi (\overline{h}/4) \quad \phi_1 (\overline{h}/2) \quad \phi_2 (\overline{h})\\
+	& \phi (\overline{h}/8) \quad \phi_1 (\overline{h}/4) \quad \phi_2 (\overline{h}/2) \quad \phi_3 (\overline{h})\\
+	& \phi (\overline{h}/16) \; \, \, \phi_1 (\overline{h}/8) \quad \phi_2 (\overline{h}/4) \quad \phi_3 (\overline{h}/2) \quad \phi_4 (\overline{h})\\
+	& ... 
+\end{split} \]
+
+
+PAGINA 39 %Simone
+a partire da un passo $h=\overline{h}$ con dimezzamenti successivi sulla prima colonna (colonna $0$). Nelle varie colonne abbiamo $\phi_i(h)=\alpha + O(h^{p_{i+1}})$, $0\leq i \leq m$.
+Ad esempio, se $f \in C^{m+1}$, con la formula di Taylor si vede subito che:
+\[ \begin{split}
+	\delta_+ (h)=f'(x)+c_1h+...+c_mh^m+O(h^{m+1})
+\end{split} \]
+cioè $p_i=i, \, 1 \leq i \leq m+2$.\\
+Invece per $f \in C^{2m+1}$, sempre partendo dalla formula di Taylor si arriva a 
+
+PAGINA 40 %Simone
+\[ \begin{split}
+	\delta (h)=f'(x)+c_2h^2+...+c_{2m}h^{2m}+O(h^{2m+1})
+\end{split} \]
+cioè $p_i=2i, \, 1 \leq i \leq m+1$.\\
+Mentre utilizzando la formula di sommazione di Eulero-McLaurin (di cui non discuteremo in questo corso) per $f \in C^{2m+2}$ si ottiene:
+\[ \begin{split}
+	I_n^{trap} (f)=I(f)+c_2h^2+...+c_{2m}h^{2m}+O(h^{2m+2})
+\end{split} \]
+che è esattamente una struttura con sole potenze pari di $h$ come quella di $\delta(h)$. Con questa struttura si ha:
+\[ \begin{split}
+	& \phi_1(h)=\dfrac{4 \phi(h/2)-\phi(h)}{3}\\
+	& \phi_2(h)=\dfrac{16 \phi(h/2)-\phi(h)}{15}\\
+	& \phi_3(h)=\dfrac{64 \phi(h/2)-\phi(h)}{63}\\
+\end{split} \]
+
+
+PAGINA 41 %Simone
+e così via.\\
+Per capire l'efficacia delle tabelle di estrapolazione, mostriamo gli errori nel calcolo di $f'(0)$ con $\phi_0(h)=\delta (h)$, $f(x)=e^x$ e di $I(f)=\int_0^1 e^{-t^2} dt$ con $\phi_0(h)=I_n^{trap} (f)$ per $f(x)=e^{-x^2/2}$, $h=\dfrac{1}{2}$, partendo da $\overline{h}=\frac{1}{2}$ con $4$ dimezzamenti successivi.
+
+
+PAGINA 42
+
+
+PAGINA 43 
+
+
+PAGINA 44%Andrea
+\\
+Nel caso della formula dei trapezi la tabella di estrapolazione è nota anche come "metodo di Romberg".\\
+L'errore finale della tabella partendo da $1_2^{\text{trap}},...,1_{32}^{\text{trap}}$ richiederebbe $1_{500'000}^{\text{trap}}$ con la formula base!\\
+Facciamo un'ultima osservazione sulla stabilità di una tabella di estrapolazione.\\
+Si può dimostrare che detti $\tilde{\phi}_O(h)=\tilde{\phi}(h)$ i valori in prima colonna affetti da errore con:
+\begin{equation*}
+    \underset{h}{max} \abs{\tilde{\phi}_O(h)-\phi_O(h)} \leq E
+\end{equation*}
+allora nel resto della tabella 
+\begin{equation*}
+    \underset{h}{max} \abs{\tilde{\phi}_i(h)-\phi_i(h)} = O(E) \; \forall i 
+\end{equation*}
+
+PAGINA 45 %Andrea
+\\
+cioè la \underline{tabella} in sé è \underline{stabile}.
+Nel caso della formula dei trapezi, che avendo pesi positivi è stabile, abbiamo $E=O(\varepsilon)$ dove:
+\begin{equation*}
+    \varepsilon \geq |f(x_i)-\tilde{f}(x_i)|
+\end{equation*}
+Invece nel caso delle formule di derivazione abbiamo $E=O(\varepsilon/h)$ (instabilità per $\varepsilon$ fissato e $h\rightarrow 0$) e questa instabilità resta tale (senza essere ulteriormente amplificata) nel resto della tabella, per cui si ha:
+\begin{equation*}
+    |\tilde{\phi}_i(h)-f'(x)|=O(h^{P_{i+1}})+O(\varepsilon/h)
+\end{equation*}
+
+PAGINA 46 %Andrea
+\\
+e abbiamo quindi un metodo semplice e poco costoso per gestire l'instabilità spostandoci a destra nella tabella ( il che è possibile se $f$ è sufficientemente regolare).
+
+
+
+\end{document}
