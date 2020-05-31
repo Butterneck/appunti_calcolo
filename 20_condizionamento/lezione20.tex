@@ -1,0 +1,324 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1.5cm]{geometry}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm} 
+\usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage{cancel}
+
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\newcommand{\inter}{\begin{matrix}\prod\end{matrix}}
+\DeclarePairedDelimiter{\norma}{\lVert}{\rVert}
+ 
+\begin{document}
+\section*{LEZIONE 20}
+\subsection*{Condizionamento di matrici e sistemi lineari}
+
+Grazie allo strumento delle norme vettoriali e matriciali indotte introdotto nella scorsa lezione, possiamo "misurare" gli errori su vettori e matrici.\\
+In questa lezione, utilizzando le due diseguaglianza fondamentali per le norme matriciali indotte
+\begin{itemize}
+    \item[(i)]$\norma{Ax} \leq \norma{A}\cdot\norma{x}$ (1$^\circ$ diseguaglianza fondamentale)
+    \item[(ii)] $\norma{AB} \leq \norma{A} \cdot\norma{B}$ (2$^\circ$ diseguaglianza fondamentale)
+\end{itemize}
+vedremo come sia possibile stimare la "risposta" di un sistema lineare non singolare agli errori sui dati
+\begin{equation*}
+    Ax=b, \ A\in \mathbb{R}^{n\times n}, \ b,x\in \mathbb{R}^n, \ det(A) \neq 0
+\end{equation*}
+Nelle applicazioni infatti sia la matrice $A$ che il vettore termine noto $b$ possono essere (e di solito sono) affetti da errori (in ogni caso gli arrotondamenti nel sistema floating-point, errori di misura sperimentale che sono di solito molto più grandi degli errori di arrotondamento, \dots).\\
+Quindi in pratica ci si trova a risolvere un sistema "perturbato"
+\begin{equation*}
+    \Tilde{A}\Tilde{x}=\Tilde{b}
+\end{equation*}
+dove $\Tilde{b}=b+\delta b$, $\Tilde{A}=A+\delta A$ cioè
+\begin{equation*}
+    \Tilde{b}= 
+    \begin{pmatrix}
+    \Tilde{b}_1\\  
+    \vdots\\ 
+    \Tilde{b}_n
+\end{pmatrix} =
+\begin{pmatrix}
+    b_1\\  
+    \vdots\\ 
+    b_n
+\end{pmatrix} + 
+\begin{pmatrix}
+    \delta b_1\\  
+    \vdots\\ 
+    \delta b_n
+\end{pmatrix}
+\end{equation*}
+\begin{equation*}
+    \Tilde{A} =
+    \begin{pmatrix}
+        \Tilde{a}_{11} & \dots & \Tilde{a}_{1n} \\
+        \vdots & & \vdots \\
+        \Tilde{a}_{n1} & \dots & \Tilde{a}_{nn}
+    \end{pmatrix} = 
+    \begin{pmatrix}
+        a_{11} & \dots & a_{1n} \\
+        \vdots & & \vdots  \\
+        a_{n1} & \dots & a_{nn}
+    \end{pmatrix} +
+    \begin{pmatrix}
+        \delta a_{11} & \dots & \delta a_{1n} \\
+        \vdots & & \vdots \\
+        \delta a_{n1} & \dots & \delta a_{nn}
+    \end{pmatrix}
+\end{equation*}
+sono il vettore termine noto "perturbato" e la matrice "perturbata" a cui corrisponde un vettore soluzione "perturbato" $\Tilde{x}=x+\delta x$
+\begin{equation*}
+    \Tilde{x}= 
+    \begin{pmatrix}
+    \Tilde{x}_1\\  
+    \vdots\\ 
+    \Tilde{x}_n
+\end{pmatrix} =
+\begin{pmatrix}
+    x_1\\  
+    \vdots\\ 
+    x_n
+\end{pmatrix} + 
+\begin{pmatrix}
+    \delta x_1\\  
+    \vdots\\ 
+    \delta x_n
+\end{pmatrix}
+\end{equation*}
+Il problema di stimare $\delta x$ in funzione di $\delta b$ e $\delta A$ è detto problema di "condizionamento" del sistema lineare corrispondente ad un'analisi di stabilità "a monte" (stabilità del problema), prima di applicare algoritmi di calcolo della soluzione.
+Cominciamo da una stima di base\\
+\textbf{\fbox{PROPOSIZIONE 1} (errore sulla soluzione di una sistema lineare generato da una perturbazione del termine noto)}\\
+Sia $A \in \mathbb{R}^{n\times n}$ una matrice non singolare, $x \in \mathbb{R}^n$ soluzione del sistema $Ax=b$, $b \neq 0$ e $\Tilde{x}=x+\delta x$ soluzione del sistema perturbato $A\Tilde{x}=\Tilde{b}=b+\delta b$.\\
+Fissata una norma vettoriale $\norma{\cdot}$ in $\mathbb{R}^n$, vale la seguente stima dell'errore "relativo" su $x$
+\begin{equation*}
+    \frac{\norma{\delta x}}{\norma{x}} \leq K(A) \frac{\norma{\delta b}}{\norma{b}}
+\end{equation*}
+dove 
+\begin{equation*}
+    k(A)=\norma{A}\cdot\norma{A^{-1}}
+\end{equation*}
+prodotto della norma indotta di $A$ e $A^{-1}$, è detto "INDICE (o anche numero) DI CONDIZIONAMENTO" della matrice $A$ (nella norma indotta).\\
+\textbf{Dimostrazione}\\Osserviamo che $x=A^{-1}b\neq0$ quindi ha senso stimare l'errore relativo in norma (cioè l'errore assoluto $\norma{\delta x}$ diviso per la "lunghezza" di $x$, cioè $\norma{x}$). \\Ora
+\begin{equation*}
+    \tilde{x}=\cancel{x}+\delta x =A^{-1}\tilde{b}=A^{-1}(b+\delta b)=\cancel{A^{-1}}b+A^{-1}\delta b
+\end{equation*}
+da cui otteniamo la stima dell'errore assoluto
+\begin{equation*}
+    \norma{\delta x}=\norma{A^{-1}\delta b}\underset{1^o dis. fond.}{\leq}\norma{A^{-1}}\cdot\norma{\delta b}
+\end{equation*}
+Per stimare l'errore relativo dobbiamo stimare da sopra $\frac{1}{\norma{x}}$, cioè da sotto $\norma{x}$.\\Siccome $x$ è la soluzione 
+\begin{equation*}
+    \norma{b}=\norma{Ax}\underset{1^o dis. fond.}{\leq}\norma{A}\cdot\norma{x}
+\end{equation*}
+da cui
+\begin{equation*}
+    \norma{x}\geq\frac{\norma{b}}{\norma{A}}
+\end{equation*}
+e
+\begin{equation*}
+    \frac{1}{\norma{x}} \le \frac{\norma{A}}{\norma{b}}
+\end{equation*}
+perciò
+\begin{equation*}
+    \frac{\norma{\delta x}}{\norma{x}}\leq \frac{\norma{A^{-1}}\cdot\norma{\delta b}}{\norma{x}}\leq \norma{A^{-1}}\cdot\norma{A}\cdot\frac{\norma{\delta b}}{\norma{b}}=k(A)\cdot\frac{\norma{\delta b}}{\norma{b}}
+\end{equation*}
+\textbf{Fine dimostrazione}\\
+Facciamo subito alcune osservazioni:\\
+1) $k(A)\geq1$ : infatti
+\begin{equation*}
+    k(A)=\norma{A^{-1}}\cdot\norma{A}\underset{1^o dis. fond.}{\geq}\norma{A^{-1}A}=\norma{I}=1
+\end{equation*}
+Quindi $k(A)$ nella stima ha il ruolo di "amplificatore" dell'errore sui dati.\\ In molte applicazioni accade che $k(A)>>1$ : in questi casi si dice che il sistema è \underline{MAL CONDIZIONATO}, il che significa che piccole perturbazioni sui dati possono portare ad errori molto grandi sulla soluzione.\\
+Non sono infrequenti sistemi di interesse in modelli applicativi per cui $k(A)\approx10^{20}$, $10^{30}$.\\In questi casi il sistema è "estremamente" mal condizionato ed amplifica in modo tale perfino gli errori di arrotondamento delle componenti di $b$, che la soluzione può perdere completamente di significato perchè
+\begin{equation*}
+    \frac{\norma{\delta x}}{\norma{x}}>1
+\end{equation*}
+(cioè l'errore diventa maggiore del 100\%).\\Per queste situazioni estreme (e comunque quando $k(A)\cdot\frac{\norma{\delta b}}{\norma{b}}>1$) non ha molto senso calcolare la soluzione del sistema con algoritmi classici (che porterebbero alla soluzione perturbata con un errore inaccettabile) ma vanno costruiti metodi particolari che "limitano" la perdita di precisione (come analogia, si pensi alla minimizzazione dell'errore in un altro classico problema molto instabile, quello del calcolo della derivata di una funzione perturbata; faremo un cenno facoltativo a questo tipo di approccio alla fine della lezione).\\Quando invece la situazione non è così estrema e $k(A)\cdot\frac{\norma{\delta b}}{\norma{b}}$ è ancora abbastanza piccolo, è comunque importante stimare $k(A)$ in qualche norma per avere un'idea di quanta precisione ci si aspetta di poter perdere rispetto alla precisione con cui sono noti i dati.\\In effetti $k(A)$ dipende dalla norma indotta che si usa: ad esempio chiameremo $k_\infty(A)$ l'indice di condizionamento rispetto alla norma $-\infty$, $k_2(A)$ quello rispetto alla norma $-2$ (indotte dalla corrispondenti norme vettoriali).\\In Matlab (come in tutti gli ambienti evoluti di calcolo) esistono funzioni predefinite per stimare l'ordine di grandezza dell'indice di condizionamento, ad es. in Matlab $cond(A) \approx K_2(A) = \norma{A}_2 \norma{A^{-1}}_2$ e $cond(A,Inf) \approx K_\infty(A) = \norma{A}_\infty \norma{A^{-1}}_\infty$.\\
+Vale la pena di fare subito un semplice esempio, per fissare le idee.\\\\
+\textbf{\fbox{ESEMPIO}} \\
+Consideriamo il sistema $2\times 2$
+\begin{equation*}
+    \begin{cases}
+        7x_1 + 10x_2 = b_1\\ 
+        5x_1 + 7x_2 = b_2
+    \end{cases}
+\end{equation*}
+con matrice (e inversa)
+\begin{equation*}
+    A=\begin{pmatrix}
+        7 & 10 \\
+        5 & 7
+    \end{pmatrix}, \
+    A^{-1}=\begin{pmatrix}
+        -7 & 10 \\
+        5 & -7 
+    \end{pmatrix}
+\end{equation*}
+Prendiamo 
+    $b=\bigl(\begin{smallmatrix}
+    b_1 \\
+    b_2
+\end{smallmatrix}\bigr) = \bigl(\begin{smallmatrix}
+    1 \\
+    0.7
+\end{smallmatrix}\bigr)$
+     a cui corrisponde la soluzione $
+x=\bigl(\begin{smallmatrix}
+    x_1 \\
+    x_2
+\end{smallmatrix}\bigr) =A^{-1}b=\bigl(\begin{smallmatrix}
+    0 \\
+    0.1
+\end{smallmatrix}\bigr)
+$
+ e consideriamo il sistema perturbato 
+
+ $A\tilde{x}=\tilde{b}=\bigl(\begin{smallmatrix}
+    \Tilde{b}_1 \\
+    \Tilde{b}_2
+\end{smallmatrix}\bigr)=\bigl(\begin{smallmatrix}
+    1.01 \\
+    0.69
+\end{smallmatrix}\bigr)$ con soluzione $\Tilde{x}=\bigl(\begin{smallmatrix}
+    \Tilde{x}_1 \\
+    \Tilde{x}_2
+\end{smallmatrix}\bigr) =A^{-1}\Tilde{b}=\bigl(\begin{smallmatrix}
+    -0.17 \\
+    0.22
+\end{smallmatrix}\bigr)$ (soluzioni calcolabili "a mano" per sostituzione)\\
+Si vede che $\delta b=\Tilde{b}-b = \bigl(\begin{smallmatrix}
+    0.01 \\
+    -0.01
+\end{smallmatrix}\bigr)$ e 
+\begin{equation*}
+    \frac{\norma{\delta b}_\infty}{\norma{b}_\infty} = \frac{max\left\{ |\delta b_1|,|\delta b_2| \right\}}{max\left\{ |b_1|,|b_2| \right\}} = \frac{0.01}{1} = 10^{-2} = 1\%
+\end{equation*} mentre $\delta x = \Tilde{x}-x=\bigl(\begin{smallmatrix}
+    -0.17 \\
+    0.12
+\end{smallmatrix}\bigr)$ e 
+\begin{equation*}
+    \frac{\norma{\delta x}_\infty}{\norma{x}_\infty} = \frac{max\left\{ |\delta x_1|,|\delta x_2| \right\}}{max\left\{ |x_1|,|x_2| \right\}} = \frac{0.17}{0.1} = 1.7 = 170\%
+\end{equation*}
+Quindi un errore relativo ($\norma{\cdot}_\infty$) dell'$1\%$ su $b$ ha come effetto un errore relativo del $170\%$ su $x$, rendendo la soluzione $\Tilde{x}$ inaccettabile. \\
+Il motivo è ben spiegato calcolando $K_\infty(A)=\norma{A}_\infty \norma{A^{-1}}_\infty$. Infatti
+\begin{equation*}
+    \norma{A}_\infty = max \left\{ \overset{\text{somme moduli 1$^\circ$ riga}}{10+7}, \overset{\text{somme moduli 2$^\circ$ riga}}{5+7} \right\} = 17
+\end{equation*}
+\begin{equation*}
+    \norma{A^{-1}}_\infty = max \left\{ 7+10, 5+7 \right\} = 17
+\end{equation*}
+(il fatto che siano uguali è casuale), quindi
+\begin{equation*}
+    K_\infty(A) = 17 \cdot 17 = 289
+\end{equation*}
+Questo valore dell'indice di condizionamento spiega molto bene come mai si siano persi più di 2 ordini nella precisione sulla soluzione rispetto alla precisione sui dati.\\
+E' il caso di osservare che un indice di condizionamento come questo (dell'ordine di $10^2$) è in realtà piccolo (non si può parlare qui di sistema mal condizionato), ma quello che conta è il prodotto
+\begin{equation*}
+   k(A)\cdot \frac{\norma{\delta b}}{\norma{b}}
+\end{equation*} che qui è $>1$ perchè l'errore sui dati è solo dell'1\%.\\Con 
+\begin{equation*}
+    \frac{\norma{\delta b}_\infty}{\norma{b}_\infty}
+\end{equation*} 
+dell'ordine di $10^{-k}$ ci aspetteremmo un errore 
+\begin{equation*}
+    \frac{\norma{\delta x}_\infty}{\norma{x}_\infty} 
+\end{equation*}dell'ordine di $10^{2-k}$ (quindi ad esempio per k=6 avremmo una soluzione $\tilde{x}$ che fa un errore relativo dell'ordine di $10^{-4}=0.01\%$, che potrebbe essere più che accettabile in molte applicazioni pratiche).\\
+Quello che conta è che se abbiamo una stima degli errori sui dati tipo
+\begin{equation*}
+    \frac{\norma{\delta b}}{\norma{b}}\approx \varepsilon
+\end{equation*} allora crescendo l'ordine di grandezza di $k(A)$ sappiamo che possiamo aspettarci un errore 
+\begin{equation*}
+    \frac{\norma{\delta x}}{\norma{x}}\lesssim k(A)\cdot\varepsilon
+\end{equation*}
+e quindi possiamo decidere se la soluzione sarà o meno accettabile\\
+-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.--.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-.-
+\\\\
+Scriviamo una seconda proprietà (è una stima da sotto) dell'indice di condizionamento \\
+2)
+\begin{equation*}
+    k(A)\geq\frac{\underset{i}{max}|\lambda_i(A)|}{\underset{i}{min}|\lambda_i(A)|}
+\end{equation*}
+Con $\lambda_i$ autovalori. Si osservi che A è invertibile quindi non ha autovalori nulli e $\underset{i}{min}|\lambda_i(A)|$ non può essere 0.\\La dimostrazione è semplice ricordando che per qualsiasi norma indotta vale la stima (localizzazione)
+\begin{equation*}
+    |\lambda_i(B)|\leq\norma{B}
+\end{equation*}
+Quindi applicando la stima con $B=A$ otteniamo
+\begin{equation*}
+    \norma{A}\geq\underset{i}{max}|\lambda_i(A)|
+\end{equation*}
+D'altra parte, chi sono gli autovalori di $A^{-1}$? Se $\lambda$ è autovalore di $A$, allora $\exists x \neq 0$ (autovettore) tale che $Ax=\lambda x$. Moltiplicando a sx per $A^{-1}$
+\begin{equation*}
+    A^{-1}Ax=Ix=x=A^{-1}\lambda x=\lambda A^{-1}x
+\end{equation*}
+da cui
+\begin{equation*}
+    A^{-1}x=\frac{1}{\lambda}x
+\end{equation*}
+cioè gli autovalori di $A^{-1}$ sono i \underline{reciproci} degli autovalori di $A$ (ricordiamo che $A$ non ha autovalori nulli) mentre gli autovettori restano gli stessi.\\
+Applicando la stima di localizzazione a $B = A^{-1}$
+\[
+\norma{A^{-1}} \ge \underset{i}{max} \abs{\lambda_i (A^{-1})} = \underset{i}{max} \abs*{\frac{1}{\lambda_i (A)}} = \frac{1}{\underset{i}{min} \abs{\lambda_i(A)}}
+\]
+quindi
+\[
+K(A) = \norma{A} \cdot \norma{A^{-1}} \ge \frac{\underset{i}{max} \abs{\lambda_i (A)}}{\underset{i}{min} \abs{\lambda_i (A)}}
+\]
+Osserviamo anche da questa stima da sotto otteniamo subito $K(A) \ge 1$ perché
+\[
+\underset{i}{max} \abs{\lambda_i(A)} \ge \underset{i}{min} \abs{\lambda_i(A)}
+\]
+Osserviamo anche che la disuguaglianza può diventare uguaglianza in certi casi: ad esempio, se $A$ è simmetrica si ha $\norma{A}_2 = \underset{i}{max} \abs{\lambda_i (A)}$ e lo stesso vale per $A^{-1}$ che resta simmetrica
+\[
+\norma{A^{-1}}_2 = \underset{i}{max} \abs{\lambda_i (A^{-1})} = \frac{1}{\underset{i}{min} \abs{\lambda_i(A)}}
+\]
+quindi
+\[
+K_2 (A) = \frac{\underset{i}{max} \abs{\lambda_i (A)}}{\underset{i}{min} \abs{\lambda_i (A)}}
+\]
+[parte facoltativa, vedi pdf prof.]\\
+Consideriamo ora situazioni in cui ci sono errori sulla matrice.\\
+Tratteremo prima il caso in cui $\delta b = 0$ e poi il caso generale cioè $\delta b \neq 0$ e $\delta A = \tilde{A} - A \neq 0$\\\\
+\textbf{\fbox{PROPOSIZIONE 2} (errore sulla soluzione di un sistema lineare generato da una perturbazione della matrice)}\\
+Sia $A \in \mathbb{R}^{n \times n}$ una matrice non singolare, $x \in \mathbb{R}^n$ soluzione del sistema $Ax = b, \ b \neq 0$ e $\tilde{x} = x + \delta x$ soluzione del sistema perturbato $\tilde{A} \tilde{x} = b, \ \tilde{A} = A + \delta A$.\\
+Fissata una norma vettoriale $\norma{\cdot}$ in $\mathbb{R}^n$, vale la seguente stima dell'errore "relativo" su $x$
+\[
+\frac{\norma{\delta_x}}{\norma{\tilde{x}}} \le k(A) \cdot \frac{\norma{\delta A}}{\norma{A}}
+\]
+\underline{Dimostrazione}:\\
+Da $\tilde{A} \tilde{x} = (A + \delta A)(x + \delta x) = b$ otteniamo
+\[
+\bcancel{Ax} + A\delta x + \delta A \tilde{x} = \bcancel{b}
+\]
+cioè
+\[
+\delta x = A^{-1} (-\delta A \tilde{x}) = -A^{-1} \delta A\tilde{x}
+\]
+Quindi
+\[
+\norma{\delta x} \le \norma{A^{-1}} \cdot \norma{\delta A \tilde{x}} \le \norma{A^{-1}} \cdot \norma{\delta A} \cdot \norma{\tilde{x}}
+\]
+e perciò
+\[
+\frac{\norma{\delta x}}{\norma{\tilde{x}}} \le \norma{A^{-1}} \cdot \norma{\delta A} = \norma{A} \cdot \norma{A^{-1}} \cdot \frac{\norma{\delta A}}{\norma{A}} = k(A) \cdot \frac{\norma{\delta A}}{\norma{A}}
+\]
+c.v.d.\\\\
+Si noti che in sostanza la stima ottenuta ci dice che la risposta del sistema ad errori sulla matrice è anch'essa determinata dall'indice di condizionamento, che ci permette di quantificare la perdita di precisione.\\
+Passiamo ora al caso generale.\\
+\textbf{TEOREMA}
+\begin{center}
+    \fbox{\begin{minipage}[t]{16cm}%
+        Sia $A \in \mathbb{R}^{n \times n}$ una matrice non singolare, $x \in \mathbb{R}^n$ soluzione del sistema $Ax = b, \ b \neq 0$ e $\tilde{x} = x + \delta x$ soluzione del sistema perturbato $\tilde{A} \tilde{x} = \tilde{b}, \ \tilde{A} = A + \delta A, \ \tilde{b} = b + \delta b$.\\
+Fissata una norma vettoriale $\norma{\cdot}$ in $\mathbb{R}^n$, vale la seguente stima dell'errore "relativo" su $x$ per $k(A) \cdot \frac{\norma{\delta A}}{\norma{A}} < 1 $
+\[
+\begin{split}
+    \frac{\norma{\delta x}}{\norma{x}} \le \frac{k(A)}{1 - k(A) \cdot \frac{\norma{\delta A}}{\norma{A}}} \cdot (\frac{\norma{\delta A}}{\norma{A}} + \frac{\norma{\delta b}}{\norma{b}})
+\end{split}
+\]
+    \end{minipage}}
+\end{center}
+[dimostrazione facoltativa, vedi pdf prof]
+Concludiamo la lezione con qualche cenno (facoltativo) $\dotso$[il resto della lezione è facoltativo, vedi il pdf del prof.]
+
+\end{document}
